@@ -34,15 +34,26 @@ type domainsRoot struct {
 	Message      string          `json:"Message"`
 	BaseImageUrl string          `json:"BaseImageUrl"`
 	BaseLinkUrl  string          `json:"BaseLinkUrl"`
-	Coins        map[string]Coin `json:"Data"`
+	Data         map[string]Coin `json:"Data"`
 	Type         int             `json:"Type"`
+}
+
+func (ds *domainsRoot) GetCoins() ([]Coin, error) {
+	var values []Coin
+	for _, value := range ds.Data {
+		value.Url = ds.BaseLinkUrl + value.Url
+		value.ImageUrl = ds.BaseImageUrl + value.ImageUrl
+		values = append(values, value)
+	}
+
+	return values, nil
 }
 
 func (s *CoinListServiceOp) List(ctx context.Context) ([]Coin, *Response, error) {
 
-	path := coinlistBasePath
+	urlPath := coinlistBasePath
 
-	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, urlPath, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -53,10 +64,10 @@ func (s *CoinListServiceOp) List(ctx context.Context) ([]Coin, *Response, error)
 		return nil, resp, err
 	}
 
-	var values []Coin
-	for _, value := range root.Coins {
-		values = append(values, value)
+	coins, err := root.GetCoins()
+	if err != nil {
+		return nil, resp, err
 	}
 
-	return values, resp, err
+	return coins, resp, err
 }

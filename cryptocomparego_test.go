@@ -1,17 +1,16 @@
 package cryptocomparego
 
 import (
+	"github.com/lucazulian/cryptocomparego/context"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
-
-	"github.com/lucazulian/cryptocomparego/context"
 )
 
 var (
-	mux *http.ServeMux
-	ctx = context.TODO()
+	mux    *http.ServeMux
+	ctx    = context.TODO()
 	client *Client
 	server *httptest.Server
 )
@@ -34,6 +33,7 @@ func testMethod(t *testing.T, r *http.Request, expected string) {
 		t.Errorf("Request method = %v, expected %v", r.Method, expected)
 	}
 }
+
 //
 //type values map[string]string
 //

@@ -1,17 +1,16 @@
 package cryptocomparego
 
 import (
-	"encoding/json"
-	"io"
 	"bytes"
+	"encoding/json"
+	"fmt"
+	"github.com/google/go-querystring/query"
+	"github.com/lucazulian/cryptocomparego/context"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"reflect"
-	"fmt"
-	"io/ioutil"
-
-	"github.com/google/go-querystring/query"
-	"github.com/lucazulian/cryptocomparego/context"
 )
 
 const (
@@ -33,7 +32,7 @@ type Client struct {
 	UserAgent string
 
 	// Services used for communicating with the API
-	Coins           CoinListService
+	Coins CoinListService
 
 	// Optional function called after every successful request made to the DO APIs
 	onRequestCompleted RequestCompletionCallback
@@ -71,7 +70,6 @@ type ErrorResponse struct {
 	// RequestID returned from the API, useful to contact support.
 	RequestID string `json:"request_id"`
 }
-
 
 func addOptions(s string, opt interface{}) (string, error) {
 	v := reflect.ValueOf(opt)
@@ -190,7 +188,6 @@ func newResponse(r *http.Response) *Response {
 	response := Response{Response: r}
 	return &response
 }
-
 
 // Do sends an API request and returns the API response. The API response is JSON decoded and stored in the value
 // pointed to by v, or returned as an error if an API error has occurred. If v implements the io.Writer interface,

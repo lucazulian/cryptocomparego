@@ -1,10 +1,10 @@
 package cryptocomparego
 
 import (
-	"testing"
 	"fmt"
 	"net/http"
 	"reflect"
+	"testing"
 )
 
 func TestCoinListList(t *testing.T) {
@@ -44,7 +44,7 @@ func TestCoinListList(t *testing.T) {
 		t.Errorf("Coins.List returned error: %v", err)
 	}
 
-	expected := []Coin{{"3808", "/coins/ltc/overview", "/media/19782/ltc.png", "LTC", "Litecoin", "Litecoin (LTC)", "Scrypt", "PoW", "2"}}
+	expected := []Coin{{"3808", "https://www.cryptocompare.com/coins/ltc/overview", "https://www.cryptocompare.com/media/19782/ltc.png", "LTC", "Litecoin", "Litecoin (LTC)", "Scrypt", "PoW", "2"}}
 
 	if !reflect.DeepEqual(acct, expected) {
 		t.Errorf("Coins.List returned %+v, expected %+v", acct, expected)

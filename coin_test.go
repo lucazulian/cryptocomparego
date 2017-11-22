@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestCoinListList(t *testing.T) {
+func TestCoinList(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -39,14 +39,14 @@ func TestCoinListList(t *testing.T) {
 		fmt.Fprint(w, response)
 	})
 
-	acct, _, err := client.Coins.List(ctx)
+	acct, _, err := client.Coin.List(ctx)
 	if err != nil {
-		t.Errorf("Coins.List returned error: %v", err)
+		t.Errorf("Coin.List returned error: %v", err)
 	}
 
 	expected := []Coin{{"3808", "https://www.cryptocompare.com/coins/ltc/overview", "https://www.cryptocompare.com/media/19782/ltc.png", "LTC", "Litecoin", "Litecoin (LTC)", "Scrypt", "PoW", "2"}}
 
 	if !reflect.DeepEqual(acct, expected) {
-		t.Errorf("Coins.List returned %+v, expected %+v", acct, expected)
+		t.Errorf("Coin.List returned %+v, expected %+v", acct, expected)
 	}
 }

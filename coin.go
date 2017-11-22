@@ -5,17 +5,17 @@ import (
 	"net/http"
 )
 
-const coinlistBasePath = "data/coinlist"
+const coinBasePath = "data/coinlist"
 
-type CoinListService interface {
+type CoinService interface {
 	List(context.Context) ([]Coin, *Response, error)
 }
 
-type CoinListServiceOp struct {
+type CoinServiceOp struct {
 	client *Client
 }
 
-var _ CoinListService = &CoinListServiceOp{}
+var _ CoinService = &CoinServiceOp{}
 
 type Coin struct {
 	Id        string `json:"Id"`
@@ -29,7 +29,7 @@ type Coin struct {
 	SortOrder string `json:"SortOrder"`
 }
 
-type domainsRoot struct {
+type coinsRoot struct {
 	Response     string          `json:"Response"`
 	Message      string          `json:"Message"`
 	BaseImageUrl string          `json:"BaseImageUrl"`
@@ -38,27 +38,27 @@ type domainsRoot struct {
 	Type         int             `json:"Type"`
 }
 
-func (ds *domainsRoot) GetCoins() ([]Coin, error) {
-	var values []Coin
+func (ds *coinsRoot) GetCoins() ([]Coin, error) {
+	var coins []Coin
 	for _, value := range ds.Data {
 		value.Url = ds.BaseLinkUrl + value.Url
 		value.ImageUrl = ds.BaseImageUrl + value.ImageUrl
-		values = append(values, value)
+		coins = append(coins, value)
 	}
 
-	return values, nil
+	return coins, nil
 }
 
-func (s *CoinListServiceOp) List(ctx context.Context) ([]Coin, *Response, error) {
+func (s *CoinServiceOp) List(ctx context.Context) ([]Coin, *Response, error) {
 
-	urlPath := coinlistBasePath
+	urlPath := coinBasePath
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, urlPath, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	root := new(domainsRoot)
+	root := new(coinsRoot)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err

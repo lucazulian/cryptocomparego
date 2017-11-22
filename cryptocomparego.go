@@ -1,11 +1,11 @@
 package cryptocomparego
 
 import (
+	"github.com/lucazulian/cryptocomparego/context"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/google/go-querystring/query"
-	"github.com/lucazulian/cryptocomparego/context"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -20,54 +20,33 @@ const (
 	mediaType      = "application/json"
 )
 
-// Client manages communication with Cryptocompare API.
 type Client struct {
-	// HTTP client used to communicate with the API.
 	client *http.Client
 
-	// Base URL for API requests.
 	BaseURL *url.URL
 
-	// User agent for client
 	UserAgent string
 
-	// Services used for communicating with the API
-	Coins CoinListService
+	Coin CoinService
 
-	// Optional function called after every successful request made to the DO APIs
+	Price PriceService
+
 	onRequestCompleted RequestCompletionCallback
 }
 
-// RequestCompletionCallback defines the type of the request callback function
 type RequestCompletionCallback func(*http.Request, *http.Response)
 
-// ListOptions specifies the optional parameters to various List methods that
-// support pagination.
-type ListOptions struct {
-	// For paginated result sets, page of results to retrieve.
-	Page int `url:"page,omitempty"`
-
-	// For paginated result sets, the number of results to include per page.
-	PerPage int `url:"per_page,omitempty"`
-}
-
-// Response is a DigitalOcean response. This wraps the standard http.Response returned from DigitalOcean.
 type Response struct {
 	*http.Response
 
-	// Monitoring URI
 	Monitor string
 }
 
-// An ErrorResponse reports the error caused by an API request
 type ErrorResponse struct {
-	// HTTP response that caused this error
 	Response *http.Response
 
-	// Error message
 	Message string `json:"message"`
 
-	// RequestID returned from the API, useful to contact support.
 	RequestID string `json:"request_id"`
 }
 
@@ -98,7 +77,6 @@ func addOptions(s string, opt interface{}) (string, error) {
 	return origURL.String(), nil
 }
 
-// NewClient returns a new DigitalOcean API client.
 func NewClient(httpClient *http.Client) *Client {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
@@ -107,15 +85,14 @@ func NewClient(httpClient *http.Client) *Client {
 	baseURL, _ := url.Parse(defaultBaseURL)
 
 	c := &Client{client: httpClient, BaseURL: baseURL, UserAgent: userAgent}
-	c.Coins = &CoinListServiceOp{client: c}
+	c.Coin = &CoinServiceOp{client: c}
+	c.Price = &PriceServiceOp{client: c}
 
 	return c
 }
 
-// ClientOpt are options for New.
 type ClientOpt func(*Client) error
 
-// New returns a new DIgitalOcean API client instance.
 func New(httpClient *http.Client, opts ...ClientOpt) (*Client, error) {
 	c := NewClient(httpClient)
 	for _, opt := range opts {
@@ -127,7 +104,6 @@ func New(httpClient *http.Client, opts ...ClientOpt) (*Client, error) {
 	return c, nil
 }
 
-// SetBaseURL is a client option for setting the base URL.
 func SetBaseURL(bu string) ClientOpt {
 	return func(c *Client) error {
 		u, err := url.Parse(bu)
@@ -140,7 +116,6 @@ func SetBaseURL(bu string) ClientOpt {
 	}
 }
 
-// SetUserAgent is a client option for setting the user agent.
 func SetUserAgent(ua string) ClientOpt {
 	return func(c *Client) error {
 		c.UserAgent = fmt.Sprintf("%s %s", ua, c.UserAgent)
@@ -148,9 +123,6 @@ func SetUserAgent(ua string) ClientOpt {
 	}
 }
 
-// NewRequest creates an API request. A relative URL can be provided in urlStr, which will be resolved to the
-// BaseURL of the Client. Relative URLS should always be specified without a preceding slash. If specified, the
-// value pointed to by body is JSON encoded and included in as the request body.
 func (c *Client) NewRequest(ctx context.Context, method, urlStr string, body interface{}) (*http.Request, error) {
 	rel, err := url.Parse(urlStr)
 	if err != nil {
@@ -178,22 +150,18 @@ func (c *Client) NewRequest(ctx context.Context, method, urlStr string, body int
 	return req, nil
 }
 
-// OnRequestCompleted sets the DO API request completion callback
 func (c *Client) OnRequestCompleted(rc RequestCompletionCallback) {
 	c.onRequestCompleted = rc
 }
 
-// newResponse creates a new Response for the provided http.Response
 func newResponse(r *http.Response) *Response {
 	response := Response{Response: r}
 	return &response
 }
 
-// Do sends an API request and returns the API response. The API response is JSON decoded and stored in the value
-// pointed to by v, or returned as an error if an API error has occurred. If v implements the io.Writer interface,
-// the raw response will be written to v, without attempting to decode it.
 func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Response, error) {
 	resp, err := context.DoRequestWithClient(ctx, c.client, req)
+
 	if err != nil {
 		return nil, err
 	}
@@ -210,6 +178,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 	response := newResponse(resp)
 
 	err = CheckResponse(resp)
+
 	if err != nil {
 		return response, err
 	}
@@ -230,6 +199,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 
 	return response, err
 }
+
 func (r *ErrorResponse) Error() string {
 	if r.RequestID != "" {
 		return fmt.Sprintf("%v %v: %d (request %q) %v",
@@ -239,9 +209,6 @@ func (r *ErrorResponse) Error() string {
 		r.Response.Request.Method, r.Response.Request.URL, r.Response.StatusCode, r.Message)
 }
 
-// CheckResponse checks the API response for errors, and returns them if present. A response is considered an
-// error if it has a status code outside the 200 range. API error responses are expected to have either no response
-// body, or a JSON response body that maps to ErrorResponse. Any other response body will be silently ignored.
 func CheckResponse(r *http.Response) error {
 	if c := r.StatusCode; c >= 200 && c <= 299 {
 		return nil

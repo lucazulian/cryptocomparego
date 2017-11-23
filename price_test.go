@@ -29,9 +29,9 @@ func TestPriceList(t *testing.T) {
 		t.Errorf("Price.List returned error: %v", err)
 	}
 
-	expected := []Price{{"BTC", 0.04502}, {"USD", 368.87}, {"EUR", 313.82},}
+	expected := []Price{{"BTC", 0.04502}, {"USD", 368.87}, {"EUR", 313.82}}
 
 	if !reflect.DeepEqual(acct, expected) {
-		t.Errorf("Coin.List returned %+v, expected %+v", acct, expected)
+		t.Errorf("Price.List returned %+v, expected %+v", acct, expected)
 	}
 }

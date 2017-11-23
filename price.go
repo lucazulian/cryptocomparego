@@ -1,8 +1,8 @@
 package cryptocomparego
 
 import (
-	"net/http"
 	"github.com/lucazulian/cryptocomparego/context"
+	"net/http"
 )
 
 const priceBasePath = "data/price"
@@ -27,8 +27,7 @@ type priceRoot map[string]float64
 func (ds *priceRoot) GetPrices() ([]Price, error) {
 	var prices []Price
 	for key, value := range *ds {
-		price := Price{key, value}
-		prices = append(prices, price)
+		prices = append(prices, Price{key, value})
 	}
 
 	return prices, nil

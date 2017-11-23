@@ -1,11 +1,11 @@
 package cryptocomparego
 
 import (
-	"github.com/lucazulian/cryptocomparego/context"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/google/go-querystring/query"
+	"github.com/lucazulian/cryptocomparego/context"
 	"io"
 	"io/ioutil"
 	"net/http"

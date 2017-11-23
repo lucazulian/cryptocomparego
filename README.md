@@ -14,3 +14,23 @@ You can view Cryptocompare API docs here: [https://www.cryptocompare.com/api/](h
 ```go
 import "github.com/lucazulian/cryptocomparego"
 ```
+
+## Examples
+
+
+To get general info for all the coins available:
+
+```go
+ctx := context.TODO()
+
+coinList, _, err := client.Coin.List((ctx)
+
+if err != nil {
+    fmt.Printf("Something bad happened: %s\n", err)
+    return err
+}
+```
+
+## Contributing
+
+We love pull requests! Please see the [contribution guidelines](CONTRIBUTING.md).

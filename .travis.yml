@@ -1,4 +1,10 @@
 language: go
 
 go:
+  - 1.8
   - 1.9.2
+
+notifications:
+  email:
+    on_success: never
+    on_failure: always

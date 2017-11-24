@@ -1,4 +1,4 @@
-[![Build Status](https://api.travis-ci.org/lucazulian/cryptocomparego.svg)](https://travis-ci.org/lucazulian/cryptocomparego)
+[![Build Status](https://api.travis-ci.org/lucazulian/cryptocomparego.svg)](https://travis-ci.org/lucazulian/cryptocomparego) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # Cryptocomparego
 
@@ -23,7 +23,7 @@ To get general info for all the coins available:
 ```go
 ctx := context.TODO()
 
-coinList, _, err := client.Coin.List((ctx)
+coinList, _, err := client.Coin.List(ctx)
 
 if err != nil {
     fmt.Printf("Something bad happened: %s\n", err)

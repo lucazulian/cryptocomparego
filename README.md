@@ -1,4 +1,7 @@
-[![Build Status](https://api.travis-ci.org/lucazulian/cryptocomparego.svg)](https://travis-ci.org/lucazulian/cryptocomparego) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://api.travis-ci.org/lucazulian/cryptocomparego.svg)](https://travis-ci.org/lucazulian/cryptocomparego)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GoDoc](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://godoc.org/github.com/lucazulian/cryptocomparego)
+[![Go Report Card](https://goreportcard.com/badge/github.com/labstack/echo?style=flat-square)](http://godoc.org/github.com/lucazulian/cryptocomparego)
 
 # Cryptocomparego
 

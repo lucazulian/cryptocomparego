@@ -3,6 +3,7 @@ package cryptocomparego
 import (
 	"github.com/lucazulian/cryptocomparego/context"
 	"net/http"
+	"sort"
 )
 
 const coinBasePath = "data/coinlist"
@@ -28,6 +29,12 @@ type Coin struct {
 	ProofType string `json:"ProofType"`
 	SortOrder string `json:"SortOrder"`
 }
+
+type CoinNamesSorter []Coin
+
+func (a CoinNamesSorter) Len() int           { return len(a) }
+func (a CoinNamesSorter) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a CoinNamesSorter) Less(i, j int) bool { return a[i].Name < a[j].Name }
 
 type coinsRoot struct {
 	Response     string          `json:"Response"`
@@ -68,6 +75,8 @@ func (s *CoinServiceOp) List(ctx context.Context) ([]Coin, *Response, error) {
 	if err != nil {
 		return nil, resp, err
 	}
+
+	sort.Sort(CoinNamesSorter(coins))
 
 	return coins, resp, err
 }

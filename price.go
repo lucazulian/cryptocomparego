@@ -3,6 +3,7 @@ package cryptocomparego
 import (
 	"github.com/lucazulian/cryptocomparego/context"
 	"net/http"
+	"sort"
 )
 
 const priceBasePath = "data/price"
@@ -21,6 +22,12 @@ type Price struct {
 	Name  string
 	Value float64
 }
+
+type PriceNamesSorter []Price
+
+func (a PriceNamesSorter) Len() int           { return len(a) }
+func (a PriceNamesSorter) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a PriceNamesSorter) Less(i, j int) bool { return a[i].Name < a[j].Name }
 
 type priceRoot map[string]float64
 
@@ -52,5 +59,8 @@ func (s *PriceServiceOp) List(ctx context.Context) ([]Price, *Response, error) {
 	if err != nil {
 		return nil, resp, err
 	}
+
+	sort.Sort(PriceNamesSorter(prices))
+
 	return prices, resp, err
 }

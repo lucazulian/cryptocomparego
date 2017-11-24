@@ -27,7 +27,8 @@ type priceRoot map[string]float64
 func (ds *priceRoot) GetPrices() ([]Price, error) {
 	var prices []Price
 	for key, value := range *ds {
-		prices = append(prices, Price{key, value})
+		price := Price{key, value}
+		prices = append(prices, price)
 	}
 
 	return prices, nil

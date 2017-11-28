@@ -1,6 +1,7 @@
 package cryptocomparego
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -13,6 +14,10 @@ func TestPriceList_NilPriceRequest(t *testing.T) {
 
 	mux.HandleFunc("/data/price", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, http.MethodGet)
+
+		if r.URL.Query().Get("fsym") != "" || r.URL.Query().Get("tsyms") != "" {
+			t.Errorf("Price.List did not request the correct fsym or tsyms")
+		}
 
 		response := `
 		{
@@ -36,20 +41,53 @@ func TestPriceList_NilPriceRequest(t *testing.T) {
 	}
 }
 
+func TestPriceList_WrongPriceRequest(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/data/price", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, http.MethodGet)
+
+		if r.URL.Query().Get("fsym") != "ETH" || r.URL.Query().Get("tsyms") != "" {
+			t.Errorf("Price.List did not request the correct fsym or tsyms")
+		}
+
+		response := `
+		{
+			"Response": "Error",
+			"Message": "tsyms param seems to be missing.",
+			"Type": 1,
+			"Aggregated": false,
+			"Data": []
+		}`
+
+		fmt.Fprint(w, response)
+	})
+
+	priceRequest := &PriceRequest{Fsym: "ETH"}
+
+	acct, _, err := client.Price.List(ctx, priceRequest)
+	if acct != nil {
+		t.Errorf("Price.List returned a value: %v", err)
+	}
+
+	expected := errors.New("tsyms param seems to be missing.")
+
+	if !reflect.DeepEqual(err, expected) {
+		t.Errorf("Price.List returned %+v, expected %+v", acct, expected)
+	}
+}
+
 func TestPriceList(t *testing.T) {
 	setup()
 	defer teardown()
 
 	mux.HandleFunc("/data/price", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Query().Get("fsym") != "ETH" {
-			t.Errorf("Price.List did not request with a fsym parameter")
-		}
-
-		if r.URL.Query().Get("tsyms") != "BTC,USD,EUR" {
-			t.Errorf("Price.List did not request with a tsyms parameter")
-		}
-
 		testMethod(t, r, http.MethodGet)
+
+		if r.URL.Query().Get("fsym") != "ETH" || r.URL.Query().Get("tsyms") != "BTC,USD,EUR" {
+			t.Errorf("Price.List did not request the correct fsym or tsyms")
+		}
 
 		response := `
 		{

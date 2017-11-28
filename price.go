@@ -1,6 +1,7 @@
 package cryptocomparego
 
 import (
+	"errors"
 	"fmt"
 	"github.com/lucazulian/cryptocomparego/context"
 	"net/http"
@@ -40,16 +41,29 @@ func (a PriceNamesSorter) Len() int           { return len(a) }
 func (a PriceNamesSorter) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a PriceNamesSorter) Less(i, j int) bool { return a[i].Name < a[j].Name }
 
-type priceRoot map[string]float64
+//type priceRoot map[string]float64
+type priceRoot map[string]interface{}
 
 func (ds *priceRoot) GetPrices() ([]Price, error) {
 	var prices []Price
 	for key, value := range *ds {
-		price := Price{key, value}
+		price := Price{key, value.(float64)}
 		prices = append(prices, price)
 	}
 
 	return prices, nil
+}
+
+func (ds *priceRoot) HasError() error {
+	//TODO try to unmarshal with error struct
+	var priceError error = nil
+	if val, ok := (*ds)["Response"]; ok {
+		if val == "Error" {
+			val, _ = (*ds)["Message"]
+			priceError = errors.New(val.(string))
+		}
+	}
+	return priceError
 }
 
 func (s *PriceServiceOp) List(ctx context.Context, priceRequest *PriceRequest) ([]Price, *Response, error) {
@@ -68,6 +82,10 @@ func (s *PriceServiceOp) List(ctx context.Context, priceRequest *PriceRequest) (
 	root := new(priceRoot)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
+		return nil, resp, err
+	}
+
+	if err := root.HasError(); err != nil {
 		return nil, resp, err
 	}
 

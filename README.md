@@ -2,6 +2,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GoDoc](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://godoc.org/github.com/lucazulian/cryptocomparego)
 [![Go Report Card](https://goreportcard.com/badge/github.com/lucazulian/cryptocomparego)](https://goreportcard.com/report/github.com/lucazulian/cryptocomparego)
+[![Coverage Status](https://coveralls.io/repos/github/lucazulian/cryptocomparego/badge.svg?branch=master)](https://coveralls.io/github/lucazulian/cryptocomparego?branch=master)
 
 # Cryptocomparego
 

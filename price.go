@@ -1,15 +1,17 @@
 package cryptocomparego
 
 import (
+	"fmt"
 	"github.com/lucazulian/cryptocomparego/context"
 	"net/http"
 	"sort"
+	"strings"
 )
 
 const priceBasePath = "data/price"
 
 type PriceService interface {
-	List(context.Context) ([]Price, *Response, error)
+	List(context.Context, *PriceRequest) ([]Price, *Response, error)
 }
 
 type PriceServiceOp struct {
@@ -21,6 +23,15 @@ var _ PriceService = &PriceServiceOp{}
 type Price struct {
 	Name  string
 	Value float64
+}
+
+type PriceRequest struct {
+	Fsym          string
+	Tsyms         []string
+	E             string
+	ExtraParams   string
+	Sign          bool
+	TryConversion bool
 }
 
 type PriceNamesSorter []Price
@@ -41,9 +52,14 @@ func (ds *priceRoot) GetPrices() ([]Price, error) {
 	return prices, nil
 }
 
-func (s *PriceServiceOp) List(ctx context.Context) ([]Price, *Response, error) {
+func (s *PriceServiceOp) List(ctx context.Context, priceRequest *PriceRequest) ([]Price, *Response, error) {
 
 	path := priceBasePath
+
+	if priceRequest != nil {
+		path = fmt.Sprintf("%s?fsym=%s&tsyms=%s", priceBasePath, priceRequest.Fsym, strings.Join(priceRequest.Tsyms, ","))
+	}
+
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err

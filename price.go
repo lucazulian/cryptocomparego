@@ -71,6 +71,7 @@ func (s *PriceServiceOp) List(ctx context.Context, priceRequest *PriceRequest) (
 	path := priceBasePath
 
 	if priceRequest != nil {
+		// TODO refactor this line
 		path = fmt.Sprintf("%s?fsym=%s&tsyms=%s", priceBasePath, priceRequest.Fsym, strings.Join(priceRequest.Tsyms, ","))
 	}
 

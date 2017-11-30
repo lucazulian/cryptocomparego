@@ -27,6 +27,7 @@ To get general info for all the coins available:
 ```go
 ctx := context.TODO()
 
+client := NewClient(nil)
 coinList, _, err := client.Coin.List(ctx)
 
 if err != nil {

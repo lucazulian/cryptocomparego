@@ -35,6 +35,47 @@ type PriceRequest struct {
 	TryConversion bool
 }
 
+func NewPriceRequest(fsym string, tsyms []string) *PriceRequest {
+	pr := PriceRequest{Fsym: fsym, Tsyms: tsyms}
+	pr.E = "CCCAGG"
+	pr.Sign = false
+	pr.TryConversion = true
+	return &pr
+}
+
+func (pr *PriceRequest) FormattedQueryString(baseUrl string) (string) {
+	var path string
+	var segments []string
+
+	if pr.Fsym != "" {
+		segments = append(segments, fmt.Sprintf("fsym=%s", pr.Fsym))
+	}
+
+	if len(pr.Tsyms) > 0 {
+		segments = append(segments, fmt.Sprintf("tsyms=%s", strings.Join(pr.Tsyms, ",")))
+	}
+
+	if pr.E != "" {
+		segments = append(segments, fmt.Sprintf("e=%s", pr.E))
+	}
+
+	if pr.ExtraParams != "" {
+		segments = append(segments, fmt.Sprintf("extraParams=%s", pr.Fsym))
+	}
+
+	segments = append(segments, fmt.Sprintf("sign=%t", pr.Sign))
+	segments = append(segments, fmt.Sprintf("tryConversion=%t", pr.TryConversion))
+
+	if len(segments) > 0 {
+		path = fmt.Sprintf("%s?%s", baseUrl, strings.Join(segments, "&"))
+	} else{
+		path = baseUrl
+	}
+
+	return path
+}
+
+//TODO try to remove Sorter duplication
 type PriceNamesSorter []Price
 
 func (a PriceNamesSorter) Len() int           { return len(a) }
@@ -71,9 +112,9 @@ func (s *PriceServiceOp) List(ctx context.Context, priceRequest *PriceRequest) (
 	path := priceBasePath
 
 	if priceRequest != nil {
-		// TODO refactor this line
-		path = fmt.Sprintf("%s?fsym=%s&tsyms=%s", priceBasePath, priceRequest.Fsym, strings.Join(priceRequest.Tsyms, ","))
+		path = priceRequest.FormattedQueryString(priceBasePath)
 	}
+
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {

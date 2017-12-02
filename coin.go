@@ -30,6 +30,7 @@ type Coin struct {
 	SortOrder string `json:"SortOrder"`
 }
 
+//TODO try to remove Sorter duplication
 type CoinNamesSorter []Coin
 
 func (a CoinNamesSorter) Len() int           { return len(a) }

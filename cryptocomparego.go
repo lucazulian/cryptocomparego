@@ -31,6 +31,8 @@ type Client struct {
 
 	Price PriceService
 
+	PriceMulti PriceMultiService
+
 	onRequestCompleted RequestCompletionCallback
 }
 
@@ -87,6 +89,7 @@ func NewClient(httpClient *http.Client) *Client {
 	c := &Client{client: httpClient, BaseURL: baseURL, UserAgent: userAgent}
 	c.Coin = &CoinServiceOp{client: c}
 	c.Price = &PriceServiceOp{client: c}
+	c.PriceMulti = &PriceMultiServiceOp{client: c}
 
 	return c
 }

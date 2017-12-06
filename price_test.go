@@ -8,8 +8,7 @@ import (
 	"testing"
 )
 
-
-func TestFormattedQueryString_NilPriceRequest(t *testing.T) {
+func TestFormattedQueryStringNilPriceRequest(t *testing.T) {
 
 	priceRequest := NewPriceRequest("", nil)
 	acct := priceRequest.FormattedQueryString("/data/price")
@@ -26,14 +25,14 @@ func TestFormattedQueryString(t *testing.T) {
 	priceRequest := NewPriceRequest("ETH", []string{"BTC", "USD", "EUR"})
 	acct := priceRequest.FormattedQueryString("/data/price")
 
-	expected := "/data/price?fsym=ETH&tsyms=BTC,USD,EUR&e=CCCAGG&sign=false&tryConversion=true"
+	expected := "/data/price?e=CCCAGG&fsym=ETH&sign=false&tryConversion=true&tsyms=BTC%2CUSD%2CEUR"
 
 	if acct != expected {
 		t.Errorf("PriceRequest.FormattedQueryString returned %+v, expected %+v", acct, expected)
 	}
 }
 
-func TestPriceList_NilPriceRequest(t *testing.T) {
+func TestPriceListNilPriceRequest(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -66,7 +65,7 @@ func TestPriceList_NilPriceRequest(t *testing.T) {
 	}
 }
 
-func TestPriceList_WrongPriceRequest(t *testing.T) {
+func TestPriceListWrongPriceRequest(t *testing.T) {
 	setup()
 	defer teardown()
 

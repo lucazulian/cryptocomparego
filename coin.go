@@ -6,7 +6,9 @@ import (
 	"sort"
 )
 
-const coinBasePath = "data/coinlist"
+const (
+	coinBasePath = "data/coinlist"
+)
 
 type CoinService interface {
 	List(context.Context) ([]Coin, *Response, error)

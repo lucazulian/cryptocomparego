@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/google/go-querystring/query"
-	"github.com/lucazulian/cryptocomparego/context"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"reflect"
+
+	"github.com/google/go-querystring/query"
+	"github.com/lucazulian/cryptocomparego/context"
 )
 
 const (
@@ -45,10 +46,8 @@ type Response struct {
 }
 
 type ErrorResponse struct {
-	Response *http.Response
-
-	Message string `json:"message"`
-
+	Response  *http.Response
+	Message   string `json:"message"`
 	RequestID string `json:"request_id"`
 }
 

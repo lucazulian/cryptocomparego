@@ -20,7 +20,7 @@ func TestFormattedQueryStringNilPriceRequest(t *testing.T) {
 	}
 }
 
-func TestFormattedQueryString(t *testing.T) {
+func TestFormattedQueryStringPriceRequest(t *testing.T) {
 
 	priceRequest := NewPriceRequest("ETH", []string{"BTC", "USD", "EUR"})
 	acct := priceRequest.FormattedQueryString("/data/price")

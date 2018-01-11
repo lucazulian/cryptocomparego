@@ -3,12 +3,13 @@ package cryptocomparego
 import (
 	"errors"
 	"fmt"
-	"github.com/lucazulian/cryptocomparego/context"
 	"net/http"
 	"net/url"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/lucazulian/cryptocomparego/context"
 )
 
 const (
@@ -73,11 +74,11 @@ func (pr *PriceRequest) FormattedQueryString(baseUrl string) string {
 }
 
 //TODO try to remove Sorter duplication
-type PriceNamesSorter []Price
+type PriceNameSorter []Price
 
-func (a PriceNamesSorter) Len() int           { return len(a) }
-func (a PriceNamesSorter) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a PriceNamesSorter) Less(i, j int) bool { return a[i].Name < a[j].Name }
+func (a PriceNameSorter) Len() int           { return len(a) }
+func (a PriceNameSorter) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a PriceNameSorter) Less(i, j int) bool { return a[i].Name < a[j].Name }
 
 type priceRoot map[string]interface{}
 
@@ -131,7 +132,7 @@ func (s *PriceServiceOp) List(ctx context.Context, priceRequest *PriceRequest) (
 		return nil, resp, err
 	}
 
-	sort.Sort(PriceNamesSorter(prices))
+	sort.Sort(PriceNameSorter(prices))
 
 	return prices, resp, err
 }

@@ -1,9 +1,10 @@
 package cryptocomparego
 
 import (
-	"github.com/lucazulian/cryptocomparego/context"
 	"net/http"
 	"sort"
+
+	"github.com/lucazulian/cryptocomparego/context"
 )
 
 const (

@@ -1,12 +1,13 @@
 package cryptocomparego
 
 import (
-	"github.com/lucazulian/cryptocomparego/context"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"reflect"
 	"testing"
+
+	"github.com/lucazulian/cryptocomparego/context"
 )
 
 var (

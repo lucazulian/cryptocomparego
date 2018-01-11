@@ -1,12 +1,15 @@
 package cryptocomparego
 
 import (
+	"errors"
 	"fmt"
-	"github.com/lucazulian/cryptocomparego/context"
 	"net/http"
 	"net/url"
+	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/lucazulian/cryptocomparego/context"
 )
 
 const (
@@ -14,11 +17,16 @@ const (
 )
 
 type PriceMultiService interface {
-	List(context.Context, *PriceMultiRequest) ([]Price, *Response, error)
+	List(context.Context, *PriceMultiRequest) ([]PriceMulti, *Response, error)
 }
 
 type PriceMultiServiceOp struct {
 	client *Client
+}
+
+type PriceMulti struct {
+	Name  string
+	Value []Price
 }
 
 var _ PriceMultiService = &PriceMultiServiceOp{}
@@ -44,7 +52,7 @@ func (pr *PriceMultiRequest) FormattedQueryString(baseUrl string) string {
 	values := url.Values{}
 
 	if len(pr.Fsyms) > 0 {
-		values.Add("fsym", strings.Join(pr.Fsyms, ","))
+		values.Add("fsyms", strings.Join(pr.Fsyms, ","))
 	}
 
 	if len(pr.Tsyms) > 0 {
@@ -65,18 +73,74 @@ func (pr *PriceMultiRequest) FormattedQueryString(baseUrl string) string {
 	return fmt.Sprintf("%s?%s", baseUrl, values.Encode())
 }
 
-func (s *PriceMultiServiceOp) List(ctx context.Context, priceMultiRequest *PriceMultiRequest) ([]Price, *Response, error) {
+//TODO try to remove Sorter duplication
+type PriceMultiNameSorter []PriceMulti
+
+func (a PriceMultiNameSorter) Len() int           { return len(a) }
+func (a PriceMultiNameSorter) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a PriceMultiNameSorter) Less(i, j int) bool { return a[i].Name < a[j].Name }
+
+type priceMultiRoot map[string]interface{}
+
+func (ds *priceMultiRoot) GetPrices() ([]PriceMulti, error) {
+	var pricesMulti []PriceMulti
+	for pKey, pValue := range *ds {
+		priceMulti := PriceMulti{}
+		priceMulti.Name = pKey
+		var prices []Price
+		for key, value := range pValue.(map[string]interface{}) {
+			price := Price{key, value.(float64)}
+			prices = append(prices, price)
+		}
+		sort.Sort(PriceNameSorter(prices))
+		priceMulti.Value = prices
+		pricesMulti = append(pricesMulti, priceMulti)
+	}
+
+	return pricesMulti, nil
+}
+
+func (ds *priceMultiRoot) HasError() error {
+	//TODO try to unmarshal with error struct
+	var priceMultiError error = nil
+	if val, ok := (*ds)["Response"]; ok {
+		if val == "Error" {
+			val, _ = (*ds)["Message"]
+			priceMultiError = errors.New(val.(string))
+		}
+	}
+	return priceMultiError
+}
+
+func (s *PriceMultiServiceOp) List(ctx context.Context, priceMultiRequest *PriceMultiRequest) ([]PriceMulti, *Response, error) {
 
 	path := pricemultiBasePath
 
 	if priceMultiRequest != nil {
-		path = priceMultiRequest.FormattedQueryString(priceBasePath)
+		path = priceMultiRequest.FormattedQueryString(pricemultiBasePath)
 	}
 
-	_, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
+	fmt.Println("ok")
+	root := new(priceMultiRoot)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
 
-	return nil, nil, nil
+	if err := root.HasError(); err != nil {
+		return nil, resp, err
+	}
+
+	prices, err := root.GetPrices()
+	if err != nil {
+		return nil, resp, err
+	}
+
+	sort.Sort(PriceMultiNameSorter(prices))
+
+	return prices, resp, err
 }

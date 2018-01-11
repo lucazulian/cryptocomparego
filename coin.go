@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	coinBasePath = "data/coinlist"
+	coinBasePath = "data/all/coinlist"
 )
 
 type CoinService interface {

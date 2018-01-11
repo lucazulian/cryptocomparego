@@ -124,7 +124,7 @@ func (s *PriceMultiServiceOp) List(ctx context.Context, priceMultiRequest *Price
 	if err != nil {
 		return nil, nil, err
 	}
-	fmt.Println("ok")
+
 	root := new(priceMultiRoot)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {

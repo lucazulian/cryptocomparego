@@ -16,7 +16,7 @@ import (
 
 const (
 	libraryVersion = "0.1.0"
-	defaultBaseURL = "https://www.cryptocompare.com/api/"
+	defaultBaseURL = "https://min-api.cryptocompare.com/"
 	userAgent      = "cryptocomparego/" + libraryVersion
 	mediaType      = "application/json"
 )

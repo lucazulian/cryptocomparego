@@ -11,7 +11,7 @@ func TestCoinList(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/data/coinlist", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/data/all/coinlist", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, http.MethodGet)
 
 		response := `

@@ -64,7 +64,7 @@ func (s *CoinServiceOp) List(ctx context.Context) ([]Coin, *Response, error) {
 
 	urlPath := coinBasePath
 
-	req, err := s.client.NewRequest(ctx, http.MethodGet, urlPath, nil)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, *s.client.MinURL, urlPath, nil)
 	if err != nil {
 		return nil, nil, err
 	}

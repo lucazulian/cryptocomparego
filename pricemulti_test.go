@@ -19,7 +19,7 @@ func TestFormattedQueryStringNilPriceMultiRequest(t *testing.T) {
 	}
 }
 
-func TestFormattedQueryStringPricMultieRequest(t *testing.T) {
+func TestFormattedQueryStringPriceMultiRequest(t *testing.T) {
 
 	priceMultiRequest := NewPriceMultiRequest([]string{"BTC", "ETH"}, []string{"BTC", "USD", "EUR"})
 	acct := priceMultiRequest.FormattedQueryString("/data/pricemulti")

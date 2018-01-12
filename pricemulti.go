@@ -120,7 +120,7 @@ func (s *PriceMultiServiceOp) List(ctx context.Context, priceMultiRequest *Price
 		path = priceMultiRequest.FormattedQueryString(pricemultiBasePath)
 	}
 
-	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, *s.client.MinURL, path, nil)
 	if err != nil {
 		return nil, nil, err
 	}

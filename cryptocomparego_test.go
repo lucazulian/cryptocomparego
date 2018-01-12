@@ -24,6 +24,7 @@ func setup() {
 	client = NewClient(nil)
 	urlParse, _ := url.Parse(server.URL)
 	client.BaseURL = urlParse
+	client.MinURL = urlParse
 }
 
 func teardown() {

@@ -112,7 +112,7 @@ func (s *PriceServiceOp) List(ctx context.Context, priceRequest *PriceRequest) (
 		path = priceRequest.FormattedQueryString(priceBasePath)
 	}
 
-	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, *s.client.MinURL, path, nil)
 	if err != nil {
 		return nil, nil, err
 	}

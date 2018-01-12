@@ -16,7 +16,8 @@ import (
 
 const (
 	libraryVersion = "0.1.0"
-	defaultBaseURL = "https://min-api.cryptocompare.com/"
+	defaultBaseURL = "https://www.cryptocompare.com/api/"
+	minBaseURL     = "https://min-api.cryptocompare.com/"
 	userAgent      = "cryptocomparego/" + libraryVersion
 	mediaType      = "application/json"
 )
@@ -26,6 +27,8 @@ type Client struct {
 
 	BaseURL *url.URL
 
+	MinURL *url.URL
+
 	UserAgent string
 
 	Coin CoinService
@@ -33,6 +36,8 @@ type Client struct {
 	Price PriceService
 
 	PriceMulti PriceMultiService
+
+	SocialStats SocialStatsService
 
 	onRequestCompleted RequestCompletionCallback
 }
@@ -89,6 +94,7 @@ func NewClient(httpClient *http.Client) *Client {
 	c.Coin = &CoinServiceOp{client: c}
 	c.Price = &PriceServiceOp{client: c}
 	c.PriceMulti = &PriceMultiServiceOp{client: c}
+	c.SocialStats = &SocialStatsServiceOp{client: c}
 
 	return c
 }
@@ -125,13 +131,13 @@ func SetUserAgent(ua string) ClientOpt {
 	}
 }
 
-func (c *Client) NewRequest(ctx context.Context, method, urlStr string, body interface{}) (*http.Request, error) {
+func (c *Client) NewRequest(ctx context.Context, method string, aaaa url.URL, urlStr string, body interface{}) (*http.Request, error) {
 	rel, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, err
 	}
 
-	u := c.BaseURL.ResolveReference(rel)
+	u := aaaa.ResolveReference(rel)
 
 	buf := new(bytes.Buffer)
 	if body != nil {
@@ -172,8 +178,8 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 	}
 
 	defer func() {
-		if rerr := resp.Body.Close(); err == nil {
-			err = rerr
+		if bErr := resp.Body.Close(); err == nil {
+			err = bErr
 		}
 	}()
 

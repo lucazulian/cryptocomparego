@@ -6,7 +6,7 @@
 
 # Cryptocomparego
 
-Cryptocomparego is a Go client library for accessing the Cryptocompare API.
+Cryptocomparego is a Golang client library for accessing the Cryptocompare API.
 
 You can view the client API docs here: [http://godoc.org/github.com/lucazulian/cryptocomparego](http://godoc.org/github.com/lucazulian/cryptocomparego)
 

@@ -16,6 +16,9 @@ const (
 	priceBasePath = "data/price"
 )
 
+// Get the current price of any cryptocurrency in any other currency that you need.
+// If the crypto does not trade directly into the toSymbol requested, BTC will be used for conversion.
+// If the oposite pair trades we invert it (eg.: BTC-XMR).
 type PriceService interface {
 	List(context.Context, *PriceRequest) ([]Price, *Response, error)
 }

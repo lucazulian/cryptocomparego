@@ -16,6 +16,7 @@ const (
 	pricemultiBasePath = "data/pricemulti"
 )
 
+// Same as single API path but with multiple from symbols.
 type PriceMultiService interface {
 	List(context.Context, *PriceMultiRequest) ([]PriceMulti, *Response, error)
 }

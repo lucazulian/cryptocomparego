@@ -37,6 +37,8 @@ type Client struct {
 
 	PriceMulti PriceMultiService
 
+	PriceMultiFull PriceMultiFullService
+
 	SocialStats SocialStatsService
 
 	onRequestCompleted RequestCompletionCallback
@@ -94,6 +96,8 @@ func NewClient(httpClient *http.Client) *Client {
 	c.Coin = &CoinServiceOp{client: c}
 	c.Price = &PriceServiceOp{client: c}
 	c.PriceMulti = &PriceMultiServiceOp{client: c}
+	c.PriceMultiFull = &PriceMultiFullServiceOp{client: c}
+
 	c.SocialStats = &SocialStatsServiceOp{client: c}
 
 	return c
@@ -131,13 +135,13 @@ func SetUserAgent(ua string) ClientOpt {
 	}
 }
 
-func (c *Client) NewRequest(ctx context.Context, method string, aaaa url.URL, urlStr string, body interface{}) (*http.Request, error) {
+func (c *Client) NewRequest(ctx context.Context, method string, baseUrl url.URL, urlStr string, body interface{}) (*http.Request, error) {
 	rel, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, err
 	}
 
-	u := aaaa.ResolveReference(rel)
+	u := baseUrl.ResolveReference(rel)
 
 	buf := new(bytes.Buffer)
 	if body != nil {

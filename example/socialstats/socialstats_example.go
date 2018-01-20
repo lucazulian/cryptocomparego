@@ -19,7 +19,6 @@ func main() {
 	}
 
 	fmt.Printf("Stats %+v\n", socialStats)
-
 	fmt.Printf("General Name %s\n", socialStats.General.Name)
 
 	for _, similarItem := range socialStats.CryptoCompare.SimilarItems {

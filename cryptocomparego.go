@@ -91,8 +91,9 @@ func NewClient(httpClient *http.Client) *Client {
 	}
 
 	baseURL, _ := url.Parse(defaultBaseURL)
+	minURL, _ := url.Parse(minBaseURL)
 
-	c := &Client{client: httpClient, BaseURL: baseURL, UserAgent: userAgent}
+	c := &Client{client: httpClient, BaseURL: baseURL, MinURL: minURL, UserAgent: userAgent}
 	c.Coin = &CoinServiceOp{client: c}
 	c.Price = &PriceServiceOp{client: c}
 	c.PriceMulti = &PriceMultiServiceOp{client: c}

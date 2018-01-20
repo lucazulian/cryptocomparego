@@ -161,7 +161,7 @@ func (s *SocialStatsServiceOp) Get(ctx context.Context, coinExchangeId string) (
 
 	path := fmt.Sprintf("%s?%s", socialstatsBasePath, values.Encode())
 
-	req, err := s.client.NewRequest(ctx, http.MethodGet, *s.client.MinURL, path, nil)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, *s.client.BaseURL, path, nil)
 	if err != nil {
 		return nil, nil, err
 	}

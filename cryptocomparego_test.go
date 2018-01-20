@@ -69,6 +69,10 @@ func testMethod(t *testing.T, r *http.Request, expected string) {
 func testClientServices(t *testing.T, c *Client) {
 	services := []string{
 		"Coin",
+		"Price",
+		"PriceMulti",
+		"PriceMultiFull",
+		"SocialStats",
 	}
 
 	cp := reflect.ValueOf(c)
@@ -87,6 +91,12 @@ func testClientDefaultBaseURL(t *testing.T, c *Client) {
 	}
 }
 
+func testClientMinURL(t *testing.T, c *Client) {
+	if c.MinURL == nil || c.MinURL.String() != minBaseURL {
+		t.Errorf("NewClient MinURL = %v, expected %v", c.MinURL, minBaseURL)
+	}
+}
+
 func testClientDefaultUserAgent(t *testing.T, c *Client) {
 	if c.UserAgent != userAgent {
 		t.Errorf("NewClient UserAgent = %v, expected %v", c.UserAgent, userAgent)
@@ -95,6 +105,7 @@ func testClientDefaultUserAgent(t *testing.T, c *Client) {
 
 func testClientDefaults(t *testing.T, c *Client) {
 	testClientDefaultBaseURL(t, c)
+	testClientMinURL(t, c)
 	testClientDefaultUserAgent(t, c)
 	testClientServices(t, c)
 }

@@ -23,10 +23,10 @@ type SocialStatsServiceOp struct {
 var _ SocialStatsService = &SocialStatsServiceOp{}
 
 type General struct {
-	Name     string `json:"Name"`
-	CoinName string `json:"CoinName"`
-	Type     string `json:"Type"`
-	Points   int    `json:"Points"`
+	Name     string      `json:"Name"`
+	CoinName interface{} `json:"CoinName"`
+	Type     interface{} `json:"Type"`
+	Points   int         `json:"Points"`
 }
 
 type PageViewsSplit struct {

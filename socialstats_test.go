@@ -362,7 +362,7 @@ func TestSocialStatsGet(t *testing.T) {
 		fmt.Fprint(w, response)
 	})
 
-	acct, _, err := client.SocialStats.Get(ctx, "1182")
+	acct, _, err := client.SocialStats.Get(ctx, 1182)
 	if err != nil {
 		t.Errorf("SocialStats.Get returned error: %v", err)
 	}

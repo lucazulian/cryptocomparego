@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 
 	"github.com/lucazulian/cryptocomparego/context"
 )
@@ -13,7 +14,7 @@ const (
 )
 
 type SocialStatsService interface {
-	Get(context.Context, string) (*SocialStats, *Response, error)
+	Get(context.Context, int) (*SocialStats, *Response, error)
 }
 
 type SocialStatsServiceOp struct {
@@ -151,13 +152,10 @@ type socialStatsRoot struct {
 	Type         int         `json:"Type"`
 }
 
-func (s *SocialStatsServiceOp) Get(ctx context.Context, coinExchangeId string) (*SocialStats, *Response, error) {
+func (s *SocialStatsServiceOp) Get(ctx context.Context, coinExchangeId int) (*SocialStats, *Response, error) {
 
 	values := url.Values{}
-
-	if len(coinExchangeId) > 0 {
-		values.Add("id", coinExchangeId)
-	}
+	values.Add("id", strconv.Itoa(coinExchangeId))
 
 	path := fmt.Sprintf("%s?%s", socialstatsBasePath, values.Encode())
 

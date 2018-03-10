@@ -3,6 +3,8 @@
 [![GoDoc](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://godoc.org/github.com/lucazulian/cryptocomparego)
 [![Go Report Card](https://goreportcard.com/badge/github.com/lucazulian/cryptocomparego)](https://goreportcard.com/report/github.com/lucazulian/cryptocomparego)
 [![Coverage Status](https://coveralls.io/repos/github/lucazulian/cryptocomparego/badge.svg?branch=master)](https://coveralls.io/github/lucazulian/cryptocomparego?branch=master)
+[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/lucazulian/cryptocomparego.svg)](http://isitmaintained.com/project/lucazulian/cryptocomparego "Average time to resolve an issue")
+[![Percentage of issues still open](http://isitmaintained.com/badge/open/lucazulian/cryptocomparego.svg)](http://isitmaintained.com/project/lucazulian/cryptocomparego "Percentage of issues still open")
 
 # Cryptocomparego
 

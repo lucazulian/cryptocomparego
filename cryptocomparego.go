@@ -41,6 +41,8 @@ type Client struct {
 
 	SocialStats SocialStatsService
 
+	Histoday HistodayService
+
 	onRequestCompleted RequestCompletionCallback
 }
 
@@ -100,6 +102,7 @@ func NewClient(httpClient *http.Client) *Client {
 	c.PriceMultiFull = &PriceMultiFullServiceOp{client: c}
 
 	c.SocialStats = &SocialStatsServiceOp{client: c}
+	c.Histoday = &HistodayServiceOp{client: c}
 
 	return c
 }
@@ -193,7 +196,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 	err = CheckResponse(resp)
 
 	if err != nil {
-		return response, err
+		return nil, err
 	}
 
 	if v != nil {
@@ -210,7 +213,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 		}
 	}
 
-	return response, err
+	return response, nil
 }
 
 func (r *ErrorResponse) Error() string {

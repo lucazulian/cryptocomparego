@@ -18,7 +18,7 @@ const (
 
 // Get the history kline data of any cryptocurrency in any other currency that you need.
 type HistominuteService interface {
-	Get(context.Context, *HistominuteRequest) ([]Histominute, *Response, error)
+	Get(context.Context, *HistominuteRequest) (*HistominuteResponse, *Response, error)
 }
 
 type HistominuteServiceOp struct {
@@ -27,7 +27,7 @@ type HistominuteServiceOp struct {
 
 var _ HistodayService = &HistodayServiceOp{}
 
-type histominuteResp struct {
+type HistominuteResponse struct {
 	Response          string         `json:"Response"`
 	Message           string         `json:"Message"` // Error Message
 	Type              int            `json:"Type"`
@@ -107,7 +107,7 @@ func (hr *HistominuteRequest) FormattedQueryString(baseUrl string) string {
 	return fmt.Sprintf("%s?%s", baseUrl, values.Encode())
 }
 
-func (s *HistominuteServiceOp) Get(ctx context.Context, histominuteRequest *HistominuteRequest) ([]Histominute, *Response, error) {
+func (s *HistominuteServiceOp) Get(ctx context.Context, histominuteRequest *HistominuteRequest) (*HistominuteResponse, *Response, error) {
 
 	path := histodyBasePath
 
@@ -133,7 +133,7 @@ func (s *HistominuteServiceOp) Get(ctx context.Context, histominuteRequest *Hist
 		return nil, &res, errors.New("Empty response")
 	}
 
-	hr := histominuteResp{}
+	hr := HistominuteResponse{}
 	err = json.Unmarshal(buf, &hr)
 	if err != nil {
 		return nil, &res, errors.Wrap(err, fmt.Sprintf("JSON Unmarshal error, raw string is '%s'", string(buf)))
@@ -142,5 +142,5 @@ func (s *HistominuteServiceOp) Get(ctx context.Context, histominuteRequest *Hist
 		return nil, &res, errors.New(hr.Message)
 	}
 
-	return hr.Data, &res, nil
+	return &hr, &res, nil
 }

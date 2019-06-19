@@ -110,7 +110,7 @@ func (hr *HistohourRequest) FormattedQueryString(baseUrl string) string {
 
 func (s *HistohourServiceOp) Get(ctx context.Context, histohourRequest *HistohourRequest) (*HistohourResponse, *Response, error) {
 
-	path := histodyBasePath
+	path := histohourBasePath
 
 	if histohourRequest != nil {
 		path = histohourRequest.FormattedQueryString(histohourBasePath)

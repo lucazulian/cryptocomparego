@@ -35,6 +35,8 @@ type Client struct {
 
 	Price PriceService
 
+	PriceHist PriceHistService
+
 	PriceMulti PriceMultiService
 
 	PriceMultiFull PriceMultiFullService
@@ -99,6 +101,7 @@ func NewClient(httpClient *http.Client) *Client {
 
 	c := &Client{client: httpClient, BaseURL: baseURL, MinURL: minURL, UserAgent: userAgent}
 	c.Coin = &CoinServiceOp{client: c}
+	c.PriceHist = &PriceHistServiceOp{client: c}
 	c.Price = &PriceServiceOp{client: c}
 	c.PriceMulti = &PriceMultiServiceOp{client: c}
 	c.PriceMultiFull = &PriceMultiFullServiceOp{client: c}

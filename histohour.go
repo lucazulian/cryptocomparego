@@ -7,39 +7,40 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"time"
 
 	"github.com/lucazulian/cryptocomparego/context"
 	"github.com/pkg/errors"
 )
 
 const (
-	histominuteBasePath = "data/histominute"
+	histohourBasePath = "data/histohour"
 )
 
 // Get the history kline data of any cryptocurrency in any other currency that you need.
-type HistominuteService interface {
-	Get(context.Context, *HistominuteRequest) (*HistominuteResponse, *Response, error)
+type HistohourService interface {
+	Get(context.Context, *HistohourRequest) (*HistohourResponse, *Response, error)
 }
 
-type HistominuteServiceOp struct {
+type HistohourServiceOp struct {
 	client *Client
 }
 
-var _ HistominuteService = &HistominuteServiceOp{}
+var _ HistohourService = &HistohourServiceOp{}
 
-type HistominuteResponse struct {
+type HistohourResponse struct {
 	Response          string         `json:"Response"`
 	Message           string         `json:"Message"` // Error Message
 	Type              int            `json:"Type"`
 	Aggregated        bool           `json:"Aggregated"`
-	Data              []Histominute  `json:"Data"`
+	Data              []Histohour    `json:"Data"`
 	TimeTo            int64          `json:"TimeTo"`
 	TimeFrom          int64          `json:"TimeFrom"`
 	FirstValueInArray bool           `json:"FirstValueInArray"`
 	ConversionType    conversionType `json:"ConversionType"`
 }
 
-type Histominute struct {
+type Histohour struct {
 	Time       int64   `json:"time"`
 	Close      float64 `json:"close"`
 	High       float64 `json:"high"`
@@ -49,7 +50,7 @@ type Histominute struct {
 	VolumeTo   float64 `json:"volumeto"`
 }
 
-type HistominuteRequest struct {
+type HistohourRequest struct {
 	Fsym          string
 	Tsym          string
 	E             string
@@ -58,27 +59,27 @@ type HistominuteRequest struct {
 	TryConversion bool
 	Aggregate     int // Not Used For Now
 	Limit         int
-	ToTs          int64
+	ToTs          time.Time
 }
 
-func NewHistominuteRequest(fsym string, tsym string, limitMinutes int, fromTime int64) *HistominuteRequest {
-	pr := HistominuteRequest{Fsym: fsym, Tsym: tsym}
+func NewHistohourRequest(fsym string, tsym string, limit int, fromTime time.Time) *HistohourRequest {
+	pr := HistohourRequest{Fsym: fsym, Tsym: tsym}
 	pr.E = "CCCAGG"
 	pr.Sign = false
 	pr.TryConversion = true
 	pr.Aggregate = 1
-	if limitMinutes < 1 {
-		limitMinutes = 1
+	if limit < 1 {
+		limit = 1
 	}
-	if limitMinutes > 2000 {
-		limitMinutes = 2000
+	if limit > 2000 {
+		limit = 2000
 	}
-	pr.Limit = limitMinutes
+	pr.Limit = limit
 	pr.ToTs = fromTime
 	return &pr
 }
 
-func (hr *HistominuteRequest) FormattedQueryString(baseUrl string) string {
+func (hr *HistohourRequest) FormattedQueryString(baseUrl string) string {
 	values := url.Values{}
 
 	if len(hr.Fsym) > 0 {
@@ -100,19 +101,19 @@ func (hr *HistominuteRequest) FormattedQueryString(baseUrl string) string {
 	values.Add("sign", strconv.FormatBool(hr.Sign))
 	values.Add("tryConversion", strconv.FormatBool(hr.TryConversion))
 	values.Add("limit", strconv.FormatInt(int64(hr.Limit), 10))
-	if hr.ToTs >= 0 {
-		values.Add("toTs", strconv.FormatInt(int64(hr.ToTs), 10))
+	if hr.ToTs.Unix() >= 0 {
+		values.Add("toTs", strconv.FormatInt(int64(hr.ToTs.Unix()), 10))
 	}
 
 	return fmt.Sprintf("%s?%s", baseUrl, values.Encode())
 }
 
-func (s *HistominuteServiceOp) Get(ctx context.Context, histominuteRequest *HistominuteRequest) (*HistominuteResponse, *Response, error) {
+func (s *HistohourServiceOp) Get(ctx context.Context, histohourRequest *HistohourRequest) (*HistohourResponse, *Response, error) {
 
-	path := histominuteBasePath
+	path := histodyBasePath
 
-	if histominuteRequest != nil {
-		path = histominuteRequest.FormattedQueryString(histominuteBasePath)
+	if histohourRequest != nil {
+		path = histohourRequest.FormattedQueryString(histohourBasePath)
 	}
 
 	reqUrl := fmt.Sprintf("%s%s", s.client.MinURL.String(), path)
@@ -133,7 +134,7 @@ func (s *HistominuteServiceOp) Get(ctx context.Context, histominuteRequest *Hist
 		return nil, &res, errors.New("Empty response")
 	}
 
-	hr := HistominuteResponse{}
+	hr := HistohourResponse{}
 	err = json.Unmarshal(buf, &hr)
 	if err != nil {
 		return nil, &res, errors.Wrap(err, fmt.Sprintf("JSON Unmarshal error, raw string is '%s'", string(buf)))

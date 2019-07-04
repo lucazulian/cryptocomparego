@@ -25,7 +25,7 @@ type HistominuteServiceOp struct {
 	client *Client
 }
 
-var _ HistodayService = &HistodayServiceOp{}
+var _ HistominuteService = &HistominuteServiceOp{}
 
 type HistominuteResponse struct {
 	Response          string         `json:"Response"`
@@ -109,14 +109,14 @@ func (hr *HistominuteRequest) FormattedQueryString(baseUrl string) string {
 
 func (s *HistominuteServiceOp) Get(ctx context.Context, histominuteRequest *HistominuteRequest) (*HistominuteResponse, *Response, error) {
 
-	path := histodyBasePath
+	path := histominuteBasePath
 
 	if histominuteRequest != nil {
 		path = histominuteRequest.FormattedQueryString(histominuteBasePath)
 	}
 
 	reqUrl := fmt.Sprintf("%s%s", s.client.MinURL.String(), path)
-	fmt.Println(reqUrl)
+
 	resp, err := http.Get(reqUrl)
 	res := Response{}
 	res.Response = resp

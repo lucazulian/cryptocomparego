@@ -1,55 +1,46 @@
 package cryptocomparego
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
-
-	"github.com/pkg/errors"
-
-	"bytes"
-	"encoding/json"
-	"io"
-	"io/ioutil"
 	"time"
 
 	"github.com/lucazulian/cryptocomparego/context"
+	"github.com/pkg/errors"
 )
 
 const (
-	histodyBasePath = "data/histoday"
+	histohourBasePath = "data/histohour"
 )
 
 // Get the history kline data of any cryptocurrency in any other currency that you need.
-type HistodayService interface {
-	Get(context.Context, *HistodayRequest) ([]Histoday, *Response, error)
+type HistohourService interface {
+	Get(context.Context, *HistohourRequest) (*HistohourResponse, *Response, error)
 }
 
-type HistodayServiceOp struct {
+type HistohourServiceOp struct {
 	client *Client
 }
 
-var _ HistodayService = &HistodayServiceOp{}
+var _ HistohourService = &HistohourServiceOp{}
 
-type conversionType struct {
-	Type             string `json:"type"`
-	ConversionSymbol string `json:"conversionSymbol"`
-}
-
-type histodayResp struct {
+type HistohourResponse struct {
 	Response          string         `json:"Response"`
 	Message           string         `json:"Message"` // Error Message
 	Type              int            `json:"Type"`
 	Aggregated        bool           `json:"Aggregated"`
-	Data              []Histoday     `json:"Data"`
+	Data              []Histohour    `json:"Data"`
 	TimeTo            int64          `json:"TimeTo"`
 	TimeFrom          int64          `json:"TimeFrom"`
 	FirstValueInArray bool           `json:"FirstValueInArray"`
 	ConversionType    conversionType `json:"ConversionType"`
 }
 
-type Histoday struct {
+type Histohour struct {
 	Time       int64   `json:"time"`
 	Close      float64 `json:"close"`
 	High       float64 `json:"high"`
@@ -59,7 +50,7 @@ type Histoday struct {
 	VolumeTo   float64 `json:"volumeto"`
 }
 
-type HistodayRequest struct {
+type HistohourRequest struct {
 	Fsym          string
 	Tsym          string
 	E             string
@@ -68,28 +59,27 @@ type HistodayRequest struct {
 	TryConversion bool
 	Aggregate     int // Not Used For Now
 	Limit         int
-	ToTs          time.Time // Not Used For Now
-	AllData       bool
+	ToTs          time.Time
 }
 
-func NewHistodayRequest(fsym string, tsym string, limitDays int, allData bool) *HistodayRequest {
-	pr := HistodayRequest{Fsym: fsym, Tsym: tsym}
+func NewHistohourRequest(fsym string, tsym string, limit int, fromTime time.Time) *HistohourRequest {
+	pr := HistohourRequest{Fsym: fsym, Tsym: tsym}
 	pr.E = "CCCAGG"
 	pr.Sign = false
 	pr.TryConversion = true
 	pr.Aggregate = 1
-	if limitDays < 1 {
-		limitDays = 1
+	if limit < 1 {
+		limit = 1
 	}
-	if limitDays > 2000 {
-		limitDays = 2000
+	if limit > 2000 {
+		limit = 2000
 	}
-	pr.Limit = limitDays
-	pr.AllData = allData
+	pr.Limit = limit
+	pr.ToTs = fromTime
 	return &pr
 }
 
-func (hr *HistodayRequest) FormattedQueryString(baseUrl string) string {
+func (hr *HistohourRequest) FormattedQueryString(baseUrl string) string {
 	values := url.Values{}
 
 	if len(hr.Fsym) > 0 {
@@ -111,30 +101,23 @@ func (hr *HistodayRequest) FormattedQueryString(baseUrl string) string {
 	values.Add("sign", strconv.FormatBool(hr.Sign))
 	values.Add("tryConversion", strconv.FormatBool(hr.TryConversion))
 	values.Add("limit", strconv.FormatInt(int64(hr.Limit), 10))
-	values.Add("allData", strconv.FormatBool(hr.AllData))
+	if hr.ToTs.Unix() >= 0 {
+		values.Add("toTs", strconv.FormatInt(int64(hr.ToTs.Unix()), 10))
+	}
 
 	return fmt.Sprintf("%s?%s", baseUrl, values.Encode())
 }
 
-func ReadAndAssignResponseBody(res *http.Response) (io.Reader, error) {
-	buf, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
+func (s *HistohourServiceOp) Get(ctx context.Context, histohourRequest *HistohourRequest) (*HistohourResponse, *Response, error) {
 
-	res.Body = ioutil.NopCloser(bytes.NewReader(buf))
-	return bytes.NewReader(buf), nil
-}
+	path := histohourBasePath
 
-func (s *HistodayServiceOp) Get(ctx context.Context, histodayRequest *HistodayRequest) ([]Histoday, *Response, error) {
-
-	path := histodyBasePath
-
-	if histodayRequest != nil {
-		path = histodayRequest.FormattedQueryString(histodyBasePath)
+	if histohourRequest != nil {
+		path = histohourRequest.FormattedQueryString(histohourBasePath)
 	}
 
 	reqUrl := fmt.Sprintf("%s%s", s.client.MinURL.String(), path)
+
 	resp, err := http.Get(reqUrl)
 	res := Response{}
 	res.Response = resp
@@ -151,7 +134,7 @@ func (s *HistodayServiceOp) Get(ctx context.Context, histodayRequest *HistodayRe
 		return nil, &res, errors.New("Empty response")
 	}
 
-	hr := histodayResp{}
+	hr := HistohourResponse{}
 	err = json.Unmarshal(buf, &hr)
 	if err != nil {
 		return nil, &res, errors.Wrap(err, fmt.Sprintf("JSON Unmarshal error, raw string is '%s'", string(buf)))
@@ -160,5 +143,5 @@ func (s *HistodayServiceOp) Get(ctx context.Context, histodayRequest *HistodayRe
 		return nil, &res, errors.New(hr.Message)
 	}
 
-	return hr.Data, &res, nil
+	return &hr, &res, nil
 }

@@ -47,6 +47,8 @@ type Client struct {
 
 	Histomin HistominuteService
 
+	HistohourSocialStats HistohourSocialStatsService
+
 	onRequestCompleted RequestCompletionCallback
 }
 
@@ -109,6 +111,8 @@ func NewClient(httpClient *http.Client) *Client {
 	c.Histoday = &HistodayServiceOp{client: c}
 	c.Histomin = &HistominuteServiceOp{client: c}
 	c.Histohour = &HistohourServiceOp{client: c}
+
+	c.HistohourSocialStats = &HistohourSocialStatsServiceOp{client: c}
 
 	return c
 }

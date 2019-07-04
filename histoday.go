@@ -2,17 +2,19 @@ package cryptocomparego
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"net/http"
 	"net/url"
 	"strconv"
 
+	"github.com/pkg/errors"
+
 	"bytes"
 	"encoding/json"
-	"github.com/lucazulian/cryptocomparego/context"
 	"io"
 	"io/ioutil"
 	"time"
+
+	"github.com/lucazulian/cryptocomparego/context"
 )
 
 const (
@@ -133,7 +135,6 @@ func (s *HistodayServiceOp) Get(ctx context.Context, histodayRequest *HistodayRe
 	}
 
 	reqUrl := fmt.Sprintf("%s%s", s.client.MinURL.String(), path)
-	fmt.Println(reqUrl)
 	resp, err := http.Get(reqUrl)
 	res := Response{}
 	res.Response = resp
